@@ -1,0 +1,84 @@
+version: "3.8"
+
+services:
+  #database section
+  
+  mc_orderdb:
+    container_name: mc_orderdb
+    restart: always
+    environment:
+      - SA_PASSWORD=Mramra1234!@
+      - ACCEPT_EULA=Y
+    volumes:
+      - order_data:/var/lib/sqlserver/data
+    ports:
+      - "1435:1433"
+
+  mc_productdb:
+    container_name: mc_productdb
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=Mramra1234!@
+      - MYSQL_TCP_PORT=3306
+      - MYSQL_DATABASE=ProductDB
+    ports:
+      - "3306:3306"
+    volumes:
+      - product_data:/var/lib/mysql
+  
+  mc_customerdb:
+    container_name: mc_customerdb
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=Mramra1234!@
+      - TZ=Asia/Ho_Chi_Minh
+    ports:
+      - "5432:5432"
+    volumes:
+      - customer_data:/var/lib/postgresql/data
+  
+  mc_basketdb:
+    container_name: mc_basketdb
+    restart: always
+    ports:
+      - "6385:6379"
+
+  mc_inventorydb:
+    container_name: mc_inventorydb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - inventory_data:/data/db
+  
+  #infrastructure section
+
+  mc_rabbitmq:
+    container_name: mc_rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  
+  mc_elasticsearch:
+    container_name: mc_elasticsearch
+    environment:
+      - xpack.monitoring.enabled=true
+      - xpack.watcher.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+  mc_kibana:
+    container_name: mc_kibana
+    environment:
+      - ELASTICSEARCH_URL=http://mc_elasticsearch:9200
+    depends_on:
+      - mc_elasticsearch
+    ports:
+      - "5601:5601"

@@ -1,0 +1,45 @@
+version: "3.8"
+
+services: 
+  #database
+  mc_orderdb:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+  
+  mc_productdb:
+    image: mysql:8.0.29
+
+  mc_customerdb:
+    image: postgres:alpine
+  
+  mc_basketdb:
+    image: redis:alpine
+    
+  mc_inventorydb:
+    image: mongo
+
+  #infrastructure section
+  mc_rabbitmq:
+    image: rabbitmq:3-management-alpine
+
+  mc_elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.2
+
+  mc_kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.2
+
+networks:
+  default:
+    name: microservices
+    driver: bridge
+
+volumes: 
+  order_data:
+    name: order_data
+  product_data:
+    name: product_data
+  customer_data:
+    name: customer_data
+  inventory_data:
+    name: inventory_data
+  elasticsearch_data:
+    name: elasticsearch_data
